@@ -1,5 +1,5 @@
 -- NIKZZ FISH IT - UPGRADED VERSION
--- DEVELOPER BY NIKZZ GGWGW
+-- DEVELOPER BY NIKZZ
 -- Updated: 11 Oct 2025 - MAJOR UPDATE
 
 print("Loading NIKZZ FISH IT - V1 UPGRADED...")
@@ -33,6 +33,10 @@ if not LocalPlayer then
     -- try wait until LocalPlayer exists (common in inject)
     repeat task.wait() LocalPlayer = Players.LocalPlayer until LocalPlayer
 end
+
+-- Flag untuk mencegah multiple execution
+local SCRIPT_LOADED = false
+local EXECUTION_COUNT = 0
 
 -- Rayfield Setup
 local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
@@ -107,6 +111,32 @@ local AwaitTradeResponse = GetRemote("RF/AwaitTradeResponse")
 -- === AUTO SAVE / LOAD (IMPROVED) ===
 local SaveFileName = "NikzzFishItSettings_" .. LocalPlayer.UserId .. ".json"
 
+local function serializeCFrame(cf)
+    if not cf then return nil end
+    local x, y, z, r00, r01, r02, r10, r11, r12, r20, r21, r22 = cf:components()
+    return {
+        position = {x = x, y = y, z = z},
+        rotation = {
+            r00 = r00, r01 = r01, r02 = r02,
+            r10 = r10, r11 = r11, r12 = r12,
+            r20 = r20, r21 = r21, r22 = r22
+        }
+    }
+end
+
+local function deserializeCFrame(t)
+    if not t then return nil end
+    if t.position and t.rotation then
+        return CFrame.new(
+            t.position.x, t.position.y, t.position.z,
+            t.rotation.r00, t.rotation.r01, t.rotation.r02,
+            t.rotation.r10, t.rotation.r11, t.rotation.r12,
+            t.rotation.r20, t.rotation.r21, t.rotation.r22
+        )
+    end
+    return nil
+end
+
 local function serializeVector3(v)
     if not v then return nil end
     return { x = v.X, y = v.Y, z = v.Z }
@@ -118,7 +148,7 @@ local function deserializeVector3(t)
 end
 
 local function SaveSettings()
-    -- build settings table (include SavedPosition & LockCFrame as position tables)
+    -- build settings table (include SavedPosition & LockCFrame as CFrame tables)
     local settingsToSave = {
         AutoFishingV1 = Config.AutoFishingV1,
         AutoFishingV2 = Config.AutoFishingV2,
@@ -148,9 +178,11 @@ local function SaveSettings()
         AutoSaveSettings = Config.AutoSaveSettings,
         Brightness = Config.Brightness,
         TimeOfDay = Config.TimeOfDay,
-        -- positions (serialize Vector3)
-        SavedPosition = (Config.SavedPosition and serializeVector3(Config.SavedPosition.Position)) or nil,
-        LockCFrame = (Config.LockCFrame and serializeVector3(Config.LockCFrame.Position)) or nil
+        -- positions (serialize CFrame)
+        SavedPosition = (Config.SavedPosition and serializeCFrame(Config.SavedPosition)) or nil,
+        LockCFrame = (Config.LockCFrame and serializeCFrame(Config.LockCFrame)) or nil,
+        CheckpointPosition = (Config.CheckpointPosition and serializeCFrame(Config.CheckpointPosition)) or nil,
+        LastLoadedPosition = (Config.LastLoadedPosition and serializeVector3(Config.LastLoadedPosition)) or nil
     }
 
     -- write file if writefile available
@@ -172,53 +204,133 @@ local function ApplySettings()
     -- This applies Config values to runtime (safe pcall wrappers)
     pcall(function()
         -- Features
-        if Config.AutoFishingV1 then AutoFishingV1() end
-        if Config.AutoFishingV2 then AutoFishingV2() end
-        if Config.AntiAFK then StartAntiAFK() end
-        if Config.AutoJump then StartAutoJump() end
-        if Config.AutoSell then StartAutoSell() end
-        if Config.AutoEnchant then AutoEnchant() end
-        if Config.AutoBuyWeather then AutoBuyWeather() end
-        if Config.AutoAcceptTrade then AutoAcceptTrade() end
-        if Config.GodMode then ToggleGodMode(true) end
-        if Config.FlyEnabled then StartFly() end
-        if Config.WalkOnWater then ToggleWalkOnWater(true) end
-        if Config.NoClip then ToggleNoClip(true) end
-        if Config.PerfectCatch then TogglePerfectCatch(true) end
-        if Config.LockedPosition and Config.LockCFrame then ToggleLockPosition(true) end
+        if Config.AutoFishingV1 then 
+            task.spawn(function()
+                task.wait(1)
+                AutoFishingV1() 
+            end)
+        end
+        if Config.AutoFishingV2 then 
+            task.spawn(function()
+                task.wait(1)
+                AutoFishingV2() 
+            end)
+        end
+        if Config.AntiAFK then 
+            task.spawn(function()
+                task.wait(1)
+                StartAntiAFK() 
+            end)
+        end
+        if Config.AutoJump then 
+            task.spawn(function()
+                task.wait(1)
+                StartAutoJump() 
+            end)
+        end
+        if Config.AutoSell then 
+            task.spawn(function()
+                task.wait(1)
+                StartAutoSell() 
+            end)
+        end
+        if Config.AutoEnchant then 
+            task.spawn(function()
+                task.wait(1)
+                AutoEnchant() 
+            end)
+        end
+        if Config.AutoBuyWeather then 
+            task.spawn(function()
+                task.wait(1)
+                AutoBuyWeather() 
+            end)
+        end
+        if Config.AutoAcceptTrade then 
+            task.spawn(function()
+                task.wait(1)
+                AutoAcceptTrade() 
+            end)
+        end
+        if Config.GodMode then 
+            task.spawn(function()
+                task.wait(1)
+                ToggleGodMode(true) 
+            end)
+        end
+        if Config.FlyEnabled then 
+            task.spawn(function()
+                task.wait(1)
+                StartFly() 
+            end)
+        end
+        if Config.WalkOnWater then 
+            task.spawn(function()
+                task.wait(1)
+                ToggleWalkOnWater(true) 
+            end)
+        end
+        if Config.NoClip then 
+            task.spawn(function()
+                task.wait(1)
+                ToggleNoClip(true) 
+            end)
+        end
+        if Config.PerfectCatch then 
+            task.spawn(function()
+                task.wait(1)
+                TogglePerfectCatch(true) 
+            end)
+        end
+        if Config.LockedPosition and Config.LockCFrame then 
+            task.spawn(function()
+                task.wait(1)
+                ToggleLockPosition(true) 
+            end)
+        end
 
         -- Movement
         if Humanoid then
-            Humanoid.WalkSpeed = tonumber(Config.WalkSpeed) or Humanoid.WalkSpeed
-            Humanoid.JumpPower = tonumber(Config.JumpPower) or Humanoid.JumpPower
+            task.spawn(function()
+                task.wait(1)
+                Humanoid.WalkSpeed = tonumber(Config.WalkSpeed) or Humanoid.WalkSpeed
+                Humanoid.JumpPower = tonumber(Config.JumpPower) or Humanoid.JumpPower
+            end)
         end
 
         -- Lighting
         if Lighting then
-            Lighting.Brightness = Config.Brightness or Lighting.Brightness
-            Lighting.ClockTime = Config.TimeOfDay or Lighting.ClockTime
-            ApplyPermanentLighting()
+            task.spawn(function()
+                task.wait(1)
+                Lighting.Brightness = Config.Brightness or Lighting.Brightness
+                Lighting.ClockTime = Config.TimeOfDay or Lighting.ClockTime
+                ApplyPermanentLighting()
+            end)
         end
 
         -- Teleport to saved position (if exists)
         if Config.SavedPosition then
-            -- wait until character/humanoid present
-            if not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                LocalPlayer.CharacterAdded:Wait()
-                task.wait(0.5)
-                Character = LocalPlayer.Character
-                HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
-                Humanoid = Character:WaitForChild("Humanoid")
-            end
-
-            pcall(function()
-                local v = Config.SavedPosition.Position or Config.SavedPosition
-                if type(v) == "table" and v.x then
-                    HumanoidRootPart.CFrame = CFrame.new(v.x, v.y, v.z)
-                elseif typeof(v) == "Vector3" then
-                    HumanoidRootPart.CFrame = CFrame.new(v)
+            task.spawn(function()
+                -- wait until character/humanoid present
+                if not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                    LocalPlayer.CharacterAdded:Wait()
+                    task.wait(2)
+                    Character = LocalPlayer.Character
+                    HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+                    Humanoid = Character:WaitForChild("Humanoid")
                 end
-                Rayfield:Notify({Title = "Settings", Content = "Teleported to saved position", Duration = 2})
+
+                pcall(function()
+                    local targetCF = Config.SavedPosition
+                    if type(targetCF) == "table" then
+                        targetCF = deserializeCFrame(targetCF)
+                    end
+                    
+                    if targetCF then
+                        HumanoidRootPart.CFrame = targetCF
+                        Rayfield:Notify({Title = "Settings", Content = "Teleported to saved position", Duration = 2})
+                    end
+                end)
             end)
         end
     end)
@@ -239,30 +351,40 @@ local function LoadSettings()
             end
 
             -- deserialize positions
-            if data.SavedPosition and data.SavedPosition.x then
-                Config.SavedPosition = CFrame.new(deserializeVector3(data.SavedPosition))
+            if data.SavedPosition then
+                Config.SavedPosition = deserializeCFrame(data.SavedPosition)
             else
                 Config.SavedPosition = nil
             end
 
-            if data.LockCFrame and data.LockCFrame.x then
-                Config.LockCFrame = CFrame.new(deserializeVector3(data.LockCFrame))
+            if data.LockCFrame then
+                Config.LockCFrame = deserializeCFrame(data.LockCFrame)
             else
                 Config.LockCFrame = nil
+            end
+            
+            if data.CheckpointPosition then
+                Config.CheckpointPosition = deserializeCFrame(data.CheckpointPosition)
+            end
+
+            if data.LastLoadedPosition then
+                Config.LastLoadedPosition = deserializeVector3(data.LastLoadedPosition)
             end
 
             print("[LoadSettings] Settings loaded from file:", SaveFileName)
             -- apply immediately
             task.spawn(function()
-                task.wait(0.8) -- short wait to allow constructor/character to settle
+                task.wait(2) -- wait for character to fully load
                 ApplySettings()
             end)
+            return true
         else
             warn("[LoadSettings] Failed to decode settings file or file empty.")
         end
     else
         print("[LoadSettings] No saved settings found or functions unavailable.")
     end
+    return false
 end
 
 -- Anti-Stuck System for Auto Fishing V1
@@ -549,45 +671,105 @@ local function TogglePerfectCatch(enabled)
     end
 end
 
--- ===== AUTO ENCHANT =====
+-- ===== AUTO ENCHANT (FIXED VERSION) =====
+local EnchantRunning = false
+local LastEnchantCheck = 0
+local EnchantCooldown = 2 -- seconds between checks
+
+local function FindEnchantStones()
+    local stones = {}
+    local backpack = LocalPlayer:FindFirstChild("Backpack")
+    local character = LocalPlayer.Character
+    
+    if backpack then
+        for _, item in pairs(backpack:GetChildren()) do
+            if item:IsA("Tool") and (item.Name:find("Enchant Stone") or item.Name:find("Super Enchant Stone")) then
+                table.insert(stones, item)
+            end
+        end
+    end
+    
+    if character then
+        for _, item in pairs(character:GetChildren()) do
+            if item:IsA("Tool") and (item.Name:find("Enchant Stone") or item.Name:find("Super Enchant Stone")) then
+                table.insert(stones, item)
+            end
+        end
+    end
+    
+    return stones
+end
+
 local function AutoEnchant()
+    if EnchantRunning then return end
+    EnchantRunning = true
+    
     task.spawn(function()
         while Config.AutoEnchant do
-            pcall(function()
-                local backpack = LocalPlayer:FindFirstChild("Backpack")
-                if not backpack then return end
+            local currentTime = tick()
+            
+            -- Cooldown check to prevent spam
+            if currentTime - LastEnchantCheck >= EnchantCooldown then
+                LastEnchantCheck = currentTime
                 
-                local enchantStone = backpack:FindFirstChild("Enchant Stone") or backpack:FindFirstChild("Super Enchant Stone")
-                
-                if enchantStone then
-                    local stoneCount = 0
-                    for _, item in pairs(backpack:GetChildren()) do
-                        if item.Name:find("Enchant Stone") then
-                            stoneCount = stoneCount + 1
+                pcall(function()
+                    -- Find enchant stones in both backpack and character
+                    local enchantStones = FindEnchantStones()
+                    local stoneCount = #enchantStones
+                    
+                    if stoneCount > 0 then
+                        -- Equip the first enchant stone found
+                        local firstStone = enchantStones[1]
+                        
+                        -- Check if stone is already equipped
+                        local isEquipped = firstStone.Parent == LocalPlayer.Character
+                        
+                        if not isEquipped then
+                            -- Equip the stone first
+                            EquipItem:FireServer(firstStone)
+                            task.wait(0.5) -- Wait for equip to complete
                         end
+                        
+                        -- Now activate enchant
+                        local success = pcall(function()
+                            ActivateEnchant:FireServer()
+                        end)
+                        
+                        if success then
+                            Rayfield:Notify({
+                                Title = "Auto Enchant",
+                                Content = "Successfully enchanted! Stones remaining: " .. (stoneCount - 1),
+                                Duration = 3
+                            })
+                            
+                            -- Wait a bit before next enchant
+                            task.wait(2)
+                        else
+                            Rayfield:Notify({
+                                Title = "Auto Enchant",
+                                Content = "Failed to enchant, retrying...",
+                                Duration = 2
+                            })
+                        end
+                    else
+                        -- No stones found, check again later
+                        if currentTime - LastEnchantCheck > 30 then -- Only notify every 30 seconds if no stones
+                            Rayfield:Notify({
+                                Title = "Auto Enchant",
+                                Content = "No enchant stones found in inventory!",
+                                Duration = 3
+                            })
+                            LastEnchantCheck = currentTime
+                        end
+                        task.wait(5) -- Wait longer if no stones
                     end
-                    
-                    ActivateEnchant:FireServer()
-                    task.wait(0.5)
-                    
-                    Rayfield:Notify({
-                        Title = "Auto Enchant",
-                        Content = "Enchanted! Stones remaining: " .. stoneCount,
-                        Duration = 2
-                    })
-                    
-                    task.wait(2)
-                else
-                    Rayfield:Notify({
-                        Title = "Auto Enchant",
-                        Content = "No enchant stones found!",
-                        Duration = 3
-                    })
-                    task.wait(5)
-                end
-            end)
-            task.wait(1)
+                end)
+            end
+            
+            task.wait(1) -- Base wait time between checks
         end
+        
+        EnchantRunning = false
     end)
 end
 
@@ -634,6 +816,91 @@ local function AutoAcceptTrade()
             task.wait(0.5)
         end
     end)
+end
+
+-- ===== ANTI MULTIPLE EXECUTION =====
+local function CheckAndPreventMultipleExecution()
+    EXECUTION_COUNT = EXECUTION_COUNT + 1
+    
+    if EXECUTION_COUNT > 1 then
+        warn("[SECURITY] Multiple execution detected! Count:", EXECUTION_COUNT)
+        
+        -- Jika ini execution ke-2 atau lebih, hentikan execution tambahan
+        if EXECUTION_COUNT > 2 then
+            warn("[SECURITY] Stopping duplicate execution")
+            return true
+        end
+    end
+    
+    return false
+end
+
+-- ===== IMPROVED AUTO RUN SYSTEM =====
+local function SetupSmartAutoRun()
+    -- Cek apakah script sudah dijalankan sebelumnya dalam session ini
+    if _G.NIKZZ_FISH_IT_LOADED then
+        print("[AutoRun] Script already loaded in this session, skipping auto-run setup")
+        return
+    end
+    
+    _G.NIKZZ_FISH_IT_LOADED = true
+    
+    print("[AutoRun] Setting up smart auto-run system...")
+    
+    -- Method 1: CoreGui error prompt (untuk auto rejoin)
+    task.spawn(function()
+        if Config.AutoRejoin then
+            local ok, err = pcall(function()
+                local overlay = game:GetService("CoreGui").RobloxPromptGui
+                if overlay and overlay.promptOverlay then
+                    overlay.promptOverlay.ChildAdded:Connect(function(child)
+                        if Config.AutoRejoin and not SCRIPT_LOADED then
+                            if child and child.Name == 'ErrorPrompt' then
+                                task.wait(1)
+                                pcall(function()
+                                    TeleportService:Teleport(game.PlaceId, LocalPlayer)
+                                end)
+                            end
+                        end
+                    end)
+                end
+            end)
+            if not ok then
+                warn("[AutoRun] Method 1 failed to setup:", err)
+            end
+        end
+    end)
+
+    -- Method 2: GuiService ErrorMessageChanged
+    task.spawn(function()
+        if Config.AutoRejoin then
+            local ok2, err2 = pcall(function()
+                game:GetService("GuiService").ErrorMessageChanged:Connect(function()
+                    if Config.AutoRejoin and not SCRIPT_LOADED then
+                        task.wait(1)
+                        pcall(function() TeleportService:Teleport(game.PlaceId, LocalPlayer) end)
+                    end
+                end)
+            end)
+            if not ok2 then
+                warn("[AutoRun] Method 2 setup failed:", err2)
+            end
+        end
+    end)
+
+    -- Method 3: OnTeleport state listener
+    if LocalPlayer and LocalPlayer.OnTeleport then
+        pcall(function()
+            LocalPlayer.OnTeleport:Connect(function(State)
+                if Config.AutoRejoin and State == Enum.TeleportState.Failed and not SCRIPT_LOADED then
+                    task.wait(1)
+                    pcall(function() TeleportService:Teleport(game.PlaceId, LocalPlayer) end)
+                end
+            end)
+        end)
+    end
+
+    print("[AutoRun] Smart auto-run system setup completed")
 end
 
 -- detect executor (nice logs)
@@ -712,6 +979,13 @@ end
 local function make_bootstrap_text(url)
     local template = [[
 -- NKZ autorun bootstrap (injected by delta autorun script)
+if _G.NIKZZ_FISH_IT_LOADED then 
+    print("[AutoRun] Script already loaded, skipping...")
+    return 
+end
+
+_G.NIKZZ_FISH_IT_LOADED = true
+
 pcall(function()
     local function http_get_local(u)
         if delta and delta.request then local r = delta.request({Url = u, Method = "GET"}) if r then return (type(r)=="table" and r.Body) or r end end
@@ -841,26 +1115,49 @@ end
 
 -- === Main setup: queue autorun + write backup + run now ===
 do
+    -- Cek dan cegah multiple execution
+    if CheckAndPreventMultipleExecution() then
+        warn("Stopping duplicate script execution")
+        return
+    end
+    
     print(("NKZ[autorun][%s] starting setup (SCRIPT_URL=%s)"):format(EXEC, SCRIPT_URL))
 
-    -- 1) queue on teleport (best)
-    local queued_ok = try_queue_on_teleport(SCRIPT_URL)
+    -- Setup smart auto-run system
+    SetupSmartAutoRun()
 
-    -- 2) writefile backup
-    local wrote_ok = try_write_boot(SCRIPT_URL)
-
-    if not queued_ok and not wrote_ok then
-        warn(("NKZ[autorun][%s] WARNING: neither queue_on_teleport nor writefile succeeded. Reliant on current session only."):format(EXEC))
+    -- 1) queue on teleport (best) - HANYA jika belum ada
+    if not _G.NIKZZ_QUEUED then
+        local queued_ok = try_queue_on_teleport(SCRIPT_URL)
+        _G.NIKZZ_QUEUED = true
+    else
+        print("[AutoRun] Already queued in this session")
     end
 
-    -- 3) run remote script right now
-    local ok, msg = fetch_and_run(SCRIPT_URL)
-    if not ok then
-        warn(("NKZ[autorun][%s] initial run failed: %s"):format(EXEC, tostring(msg)))
+    -- 2) writefile backup - HANYA jika belum ada
+    if not _G.NIKZZ_BOOT_WRITTEN then
+        local wrote_ok = try_write_boot(SCRIPT_URL)
+        _G.NIKZZ_BOOT_WRITTEN = true
+    else
+        print("[AutoRun] Boot file already written in this session")
+    end
+
+    -- 3) run remote script right now - HANYA jika belum dijalankan
+    if not _G.NIKZZ_SCRIPT_EXECUTED then
+        local ok, msg = fetch_and_run(SCRIPT_URL)
+        if not ok then
+            warn(("NKZ[autorun][%s] initial run failed: %s"):format(EXEC, tostring(msg)))
+        else
+            _G.NIKZZ_SCRIPT_EXECUTED = true
+        end
+    else
+        print("[AutoRun] Script already executed in this session")
     end
 
     -- 4) setup the auto rejoin (your provided code)
     pcall(function() SetupAutoRejoin() end)
+    
+    SCRIPT_LOADED = true
 end
 
 -- ===== ENABLE RADAR =====
@@ -1579,7 +1876,7 @@ local function CreateUI()
         end
     })
     
-    Tab1:CreateSection("Auto Enchant")
+    Tab1:CreateSection("Auto Enchant - FIXED")
     
     Tab1:CreateToggle({
         Name = "Auto Enchant Rod",
@@ -1587,14 +1884,48 @@ local function CreateUI()
         Callback = function(Value)
             Config.AutoEnchant = Value
             if Value then 
-                AutoEnchant()
                 Rayfield:Notify({
                     Title = "Auto Enchant",
-                    Content = "Will auto enchant when stones available!",
+                    Content = "Searching for enchant stones in inventory...",
                     Duration = 3
+                })
+                task.wait(1)
+                AutoEnchant()
+            else
+                Rayfield:Notify({
+                    Title = "Auto Enchant",
+                    Content = "Auto enchant disabled",
+                    Duration = 2
                 })
             end
             SaveSettings()
+        end
+    })
+    
+    Tab1:CreateButton({
+        Name = "Check Enchant Stones",
+        Callback = function()
+            local stones = FindEnchantStones()
+            local stoneCount = #stones
+            
+            if stoneCount > 0 then
+                local stoneNames = ""
+                for i, stone in ipairs(stones) do
+                    stoneNames = stoneNames .. stone.Name .. (i < stoneCount and ", " or "")
+                end
+                
+                Rayfield:Notify({
+                    Title = "Enchant Stones Found",
+                    Content = string.format("Found %d stones: %s", stoneCount, stoneNames),
+                    Duration = 5
+                })
+            else
+                Rayfield:Notify({
+                    Title = "No Enchant Stones",
+                    Content = "No enchant stones found in inventory",
+                    Duration = 3
+                })
+            end
         end
     })
     
@@ -2764,16 +3095,25 @@ end)
 -- Main Execution
 print("Initializing NIKZZ FISH IT - V1 UPGRADED...")
 
-task.wait(1)
-Config.CheckpointPosition = HumanoidRootPart.CFrame
-print("Checkpoint position saved")
-
--- Load saved settings if auto save is enabled
-LoadSettings()
-
-local success, err = pcall(function()
+local function InitializeScript()
+    -- Load saved settings first
+    LoadSettings()
+    
+    -- Create UI
     CreateUI()
-end)
+    
+    -- Apply settings after UI is created
+    task.wait(2)
+    ApplySettings()
+    
+    -- Setup auto rejoin
+    if Config.AutoRejoin then
+        task.wait(1)
+        SetupAutoRejoin()
+    end
+    
+    SCRIPT_LOADED = true
+end
 
 if not success then
     warn("ERROR: " .. tostring(err))
@@ -2800,3 +3140,6 @@ else
     print("All bugs from V1 have been fixed!")
     print("Enjoy the upgraded experience!")
 end
+
+-- Start the script
+InitializeScript()
