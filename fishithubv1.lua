@@ -1,5 +1,5 @@
 -- NIKZZ FISH IT - UPGRADED VERSION
--- DEVELOPER BY NIKZZ
+-- DEVELOPER BY NIKZZ GANTENG
 -- Updated: 11 Oct 2025 - MAJOR UPDATE
 
 print("Loading NIKZZ FISH IT - V1 UPGRADED...")
@@ -9,7 +9,7 @@ if not game:IsLoaded() then
 end
 
 -- Services
-local SCRIPT_URL = "https://raw.githubusercontent.com/nikzzxiter/NIKZZ/refs/heads/main/fishitv1.lua"
+local SCRIPT_URL = "https://raw.githubusercontent.com/nikzzxiter/nkzfishit/refs/heads/main/fishithubv1.lua"
 local BOOTFILE = "nkz_delta_autorun_boot.lua"
 local Config = Config or { AutoRejoin = true } -- jika sudah ada Config di script utama, ini tidak menimpa
 local Rayfield = Rayfield or (rawget(_G, "Rayfield") and _G.Rayfield) -- jaga jika Rayfield ada
