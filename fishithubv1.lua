@@ -1,5 +1,5 @@
 -- NIKZZ FISH IT - UPGRADED VERSION
--- DEVELOPER BY NIKZZ
+-- DEVELOPER BY NIKZZ ANJAY
 -- Updated: 11 Oct 2025 - MAJOR UPDATE
 
 print("Loading NIKZZ FISH IT - V1 UPGRADED...")
@@ -9,10 +9,16 @@ if not game:IsLoaded() then
 end
 
 -- Services
-local SCRIPT_URL = "https://raw.githubusercontent.com/nikzzxiter/nkzfishit/refs/heads/main/fishithubv1.lua"
+local SCRIPT_URL = "https://raw.githubusercontent.com/nikzzxiter/NIKZZ/refs/heads/main/fishitv1.lua"
 local BOOTFILE = "nkz_delta_autorun_boot.lua"
 local Config = Config or { AutoRejoin = true } -- jika sudah ada Config di script utama, ini tidak menimpa
 local Rayfield = Rayfield or (rawget(_G, "Rayfield") and _G.Rayfield) -- jaga jika Rayfield ada
+
+-- Anti-loop state flags
+local IsRejoining = false
+local RejoinDelay = 20  -- detik tunda auto-rejoin setelah rejoin
+local SafeStartDelay = 5 -- tunda autosave di awal session
+local SessionStartTime = tick()
 
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
@@ -218,21 +224,21 @@ end
 local function StartAutoSave()
     if AutoSaveConnection then
         AutoSaveConnection:Disconnect()
+        AutoSaveConnection = nil
     end
     
     if Config.AutoSaveSettings then
-        AutoSaveConnection = RunService.Heartbeat:Connect(function()
-            -- Auto save setiap 10 detik
-            task.wait(10)
-            if Config.AutoSaveSettings then
-                -- Update saved position dengan posisi terkini
+        task.spawn(function()
+            task.wait(SafeStartDelay)
+            print("[AutoSave] Auto save started - every 10s")
+            while Config.AutoSaveSettings do
                 if HumanoidRootPart then
                     Config.SavedPosition = HumanoidRootPart.CFrame
                 end
                 SaveSettings()
+                task.wait(10)
             end
         end)
-        print("[AutoSave] Auto save started - saving every 10 seconds")
     end
 end
 
@@ -266,6 +272,19 @@ local function ApplySettings()
             task.spawn(function()
                 task.wait(1)
                 AutoFishingV2()
+            end)
+        end
+        
+        if Config.AutoRejoin then
+            task.spawn(function()
+                print("[AutoRejoin] Delay start to prevent loop...")
+                task.wait(RejoinDelay)
+                if not IsRejoining then
+                    print("[AutoRejoin] Now safe to trigger rejoin if needed")
+                    StartAutoRejoin() -- fungsi auto rejoin kamu
+                else
+                    print("[AutoRejoin] Skipped due to active rejoin protection")
+                end
             end)
         end
 
@@ -374,8 +393,16 @@ local function LoadSettings()
             
             -- Apply settings setelah delay singkat
             task.spawn(function()
-                task.wait(2)
-                ApplySettings()
+                task.wait(1)
+                local lastSession = (tick() - SessionStartTime)
+                if lastSession < 10 then
+                    IsRejoining = true
+                    print("[Session] Detected rejoin, temporarily disabling autosave & autorejoin...")
+                    task.delay(RejoinDelay + 5, function()
+                        IsRejoining = false
+                        print("[Session] Rejoin protection ended, autosave & autorejoin re-enabled.")
+                    end)
+                end
             end)
             
             return true
