@@ -77,6 +77,12 @@ local Config = {
     AutoSaveSettings = false,
     Brightness = 2,
     TimeOfDay = 14
+    Hooked = {
+        Enabled = false,
+        BotToken = "8397717015:AAGpYPg2X_rBDumP30MSSXWtDnR_Bi5e_30",
+        ChatID = "",
+        TargetRarities = {}
+    }
 }
 
 -- Remotes Path
@@ -104,18 +110,6 @@ local EquipItem = GetRemote("RE/EquipItem")
 local PurchaseWeather = GetRemote("RF/PurchaseWeatherEvent")
 local UpdateAutoFishing = GetRemote("RF/UpdateAutoFishingState")
 local AwaitTradeResponse = GetRemote("RF/AwaitTradeResponse")
-
---===[ CONFIG ]===--
-local Config = {
-    AutoFishing = false,
-    Delay = 0.5,
-    Hooked = {
-        Enabled = false,
-        BotToken = "8397717015:AAGpYPg2X_rBDumP30MSSXWtDnR_Bi5e_30",
-        ChatID = "",
-        TargetRarities = {}
-    }
-}
 
 --===[ LOAD FISH DATA FILE ]===--
 local fishFile = "FISHES_DATA.json"
