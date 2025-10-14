@@ -1,5 +1,5 @@
 -- NIKZZ FISH IT - UPGRADED VERSION
--- DEVELOPER BY NIKZZ GANTENG
+-- DEVELOPER BY NIKZZ
 -- Updated: 11 Oct 2025 - MAJOR UPDATE
 
 print("Loading NIKZZ FISH IT - V1 UPGRADED...")
@@ -2567,69 +2567,99 @@ end
         end
     })
     
-    -- ===== SETTINGS TAB (NEW) =====
+    -- ===== SETTINGS TAB (IMPROVED) =====
     local Tab8 = Window:CreateTab("⚙️ Settings", 4483362458)
-    
+
     Tab8:CreateSection("Auto Save & Load")
-    
+
     Tab8:CreateToggle({
-        Name = "Auto Save Settings",
+        Name = "Auto Save Settings (Every 10s)",
         CurrentValue = false,
         Callback = function(Value)
             Config.AutoSaveSettings = Value
             if Value then
+                StartAutoSave()
                 Rayfield:Notify({
                     Title = "Auto Save",
-                    Content = "Settings will be saved automatically!",
+                    Content = "Settings will auto-save every 10 seconds!",
                     Duration = 3
+                })
+            else
+                if AutoSaveConnection then
+                    AutoSaveConnection:Disconnect()
+                    AutoSaveConnection = nil
+                end
+            end
+            SaveSettings()
+        end
+    })
+
+    Tab8:CreateButton({
+        Name = "💾 Save Settings Now + Position",
+        Callback = function()
+            if HumanoidRootPart then
+                Config.SavedPosition = HumanoidRootPart.CFrame
+            end
+            Config.ManualSave = true
+            SaveSettings()
+        end
+    })
+
+    Tab8:CreateButton({
+        Name = "📂 Load Saved Settings",
+        Callback = function()
+            LoadSettings()
+        end
+    })
+
+    Tab8:CreateButton({
+        Name = "🗑️ Delete Saved Settings",
+        Callback = function()
+            if isfile and isfile(SaveFileName) then
+                delfile(SaveFileName)
+                Rayfield:Notify({
+                    Title = "Settings Deleted", 
+                    Content = "All saved settings cleared!",
+                    Duration = 2
+                })
+            else
+                Rayfield:Notify({
+                    Title = "Error", 
+                    Content = "No saved settings found!",
+                    Duration = 2
                 })
             end
         end
     })
-    
+
     Tab8:CreateButton({
-        Name = "Save Settings Now",
+        Name = "📍 Save Current Position Only",
         Callback = function()
-            Config.AutoSaveSettings = true
-            SaveSettings()
-            Rayfield:Notify({Title = "Saved", Content = "All settings saved successfully!", Duration = 2})
-        end
-    })
-    
-    Tab8:CreateButton({
-        Name = "Load Saved Settings",
-        Callback = function()
-            Config.AutoSaveSettings = true
-            LoadSettings()
-            Rayfield:Notify({Title = "Loaded", Content = "Settings loaded successfully!", Duration = 2})
-        end
-    })
-    
-    Tab8:CreateButton({
-        Name = "Delete Saved Settings",
-        Callback = function()
-            if isfile(SaveFileName) then
-                delfile(SaveFileName)
-                Rayfield:Notify({Title = "Deleted", Content = "Saved settings deleted!", Duration = 2})
-            else
-                Rayfield:Notify({Title = "Error", Content = "No saved settings found!", Duration = 2})
+            if HumanoidRootPart then
+                Config.SavedPosition = HumanoidRootPart.CFrame
+                Rayfield:Notify({
+                    Title = "Position Saved",
+                    Content = "Current position and orientation saved!",
+                    Duration = 2
+                })
+                SaveSettings()
             end
         end
     })
-    
-    Tab8:CreateSection("Script Control")
-    
+
+    Tab8:CreateSection("Backup & Restore")
+
     Tab8:CreateButton({
-        Name = "Show Current Settings",
+        Name = "📊 Show Current Settings",
         Callback = function()
-            local settings = string.format(
+            local settingsText = string.format(
                 "=== CURRENT SETTINGS ===\n" ..
                 "Auto Fishing V1: %s\n" ..
                 "Auto Fishing V2: %s\n" ..
-                "Fishing Delay: %.1f\n" ..
+                "Fishing Delay: %.1fs\n" ..
                 "Perfect Catch: %s\n" ..
                 "Anti AFK: %s\n" ..
-                "Auto Jump: %s\n" ..
+                "Auto Jump: %s (Delay: %ss)\n" ..
                 "Auto Sell: %s\n" ..
                 "God Mode: %s\n" ..
                 "Auto Enchant: %s\n" ..
@@ -2637,14 +2667,24 @@ end
                 "Auto Accept Trade: %s\n" ..
                 "Auto Rejoin: %s\n" ..
                 "Walk Speed: %d\n" ..
-                "Fly Speed: %d\n" ..
+                "Jump Power: %d\n" ..
+                "Fly: %s (Speed: %d)\n" ..
+                "Walk on Water: %s\n" ..
+                "NoClip: %s\n" ..
+                "XRay: %s\n" ..
+                "ESP: %s\n" ..
+                "Lock Position: %s\n" ..
+                "Auto Save: %s\n" ..
+                "Brightness: %.1f\n" ..
+                "Time of Day: %.1f\n" ..
+                "Has Saved Position: %s\n" ..
                 "=== END ===",
                 Config.AutoFishingV1 and "ON" or "OFF",
                 Config.AutoFishingV2 and "ON" or "OFF",
                 Config.FishingDelay,
                 Config.PerfectCatch and "ON" or "OFF",
                 Config.AntiAFK and "ON" or "OFF",
-                Config.AutoJump and "ON" or "OFF",
+                Config.AutoJump and "ON" or "OFF", Config.AutoJumpDelay,
                 Config.AutoSell and "ON" or "OFF",
                 Config.GodMode and "ON" or "OFF",
                 Config.AutoEnchant and "ON" or "OFF",
@@ -2652,10 +2692,24 @@ end
                 Config.AutoAcceptTrade and "ON" or "OFF",
                 Config.AutoRejoin and "ON" or "OFF",
                 Config.WalkSpeed,
-                Config.FlySpeed
+                Config.JumpPower,
+                Config.FlyEnabled and "ON" or "OFF", Config.FlySpeed,
+                Config.WalkOnWater and "ON" or "OFF",
+                Config.NoClip and "ON" or "OFF",
+                Config.XRay and "ON" or "OFF",
+                Config.ESPEnabled and "ON" or "OFF",
+                Config.LockedPosition and "ON" or "OFF",
+                Config.AutoSaveSettings and "ON" or "OFF",
+                Config.Brightness,
+                Config.TimeOfDay,
+                Config.SavedPosition and "YES" or "NO"
             )
-            print(settings)
-            Rayfield:Notify({Title = "Current Settings", Content = "Check console (F9)", Duration = 3})
+            print(settingsText)
+            Rayfield:Notify({
+                Title = "Current Settings", 
+                Content = "Check console (F9) for details",
+                Duration = 4
+            })
         end
     })
     
@@ -2900,8 +2954,26 @@ task.wait(1)
 Config.CheckpointPosition = HumanoidRootPart.CFrame
 print("Checkpoint position saved")
 
--- Load saved settings if auto save is enabled
-LoadSettings()
+-- Auto load settings ketika script mulai (tanpa perlu toggle)
+task.spawn(function()
+    task.wait(3) -- Tunggu UI load dulu
+    print("Attempting to load saved settings...")
+    LoadSettings()
+end)
+
+-- Handle character respawn untuk reload settings
+LocalPlayer.CharacterAdded:Connect(function(char)
+    Character = char
+    HumanoidRootPart = char:WaitForChild("HumanoidRootPart")
+    Humanoid = char:WaitForChild("Humanoid")
+    
+    task.wait(3) -- Tunggu character fully loaded
+    
+    -- Reapply settings setelah respawn
+    task.spawn(function()
+        ApplySettings()
+    end)
+end)
 
 local success, err = pcall(function()
     CreateUI()
