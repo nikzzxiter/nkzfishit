@@ -1,5 +1,5 @@
 -- NIKZZ FISH IT - FINAL INTEGRATED VERSION
--- DEVELOPER BY NIKZZ CAKEPPP
+-- DEVELOPER BY NIKZZ
 -- COMPLETE SYSTEM: AUTO QUEST + FISHING + TELEGRAM HOOK + DATABASE
 -- VERSION: FINAL MERGED - ALL FEATURES INTEGRATED
 
@@ -394,7 +394,7 @@ local Config = {
     FishingDelay = 0.3,
     UltraInstantBite = false,
     CycleSpeed = 0.1, -- 100ms per cycle
-    MaxPerformance = true
+    MaxPerformance = true, 
     PerfectCatch = false,
     AntiAFK = false,
     AutoJump = false,
@@ -2037,7 +2037,7 @@ local function CreateUI()
     })
     
     Tab1:CreateToggle({
-        Name = "Max Performance",
+        Name = "Max Speed",
         CurrentValue = Config.MaxPerformance,
         Callback = function(Value)
             Config.MaxPerformance = Value
