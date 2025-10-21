@@ -1,5 +1,5 @@
 -- NIKZZ FISH IT - FINAL INTEGRATED VERSION
--- DEVELOPER BY NIKZZ
+-- DEVELOPER BY NIKZZ CAKEPPP
 -- COMPLETE SYSTEM: AUTO QUEST + FISHING + TELEGRAM HOOK + DATABASE
 -- VERSION: FINAL MERGED - ALL FEATURES INTEGRATED
 
@@ -392,6 +392,9 @@ local Config = {
     AutoFishingV2 = false,
     AutoFishingStable = false,
     FishingDelay = 0.3,
+    UltraInstantBite = false,
+    CycleSpeed = 0.1, -- 100ms per cycle
+    MaxPerformance = true
     PerfectCatch = false,
     AntiAFK = false,
     AutoJump = false,
@@ -2027,6 +2030,7 @@ local function CreateUI()
         Range = {0.01, 1.0},
         Increment = 0.01,
         CurrentValue = Config.CycleSpeed,
+        Suffix = "s",
         Callback = function(Value)
             Config.CycleSpeed = Value
         end
