@@ -1,5 +1,5 @@
 -- NIKZZ FISH IT - FINAL INTEGRATED VERSION
--- DEVELOPER BY NIKZZ
+-- DEVELOPER BY NIKZZ MANCING KANG
 -- COMPLETE SYSTEM: AUTO QUEST + FISHING + TELEGRAM HOOK + DATABASE
 -- VERSION: FINAL MERGED - ALL FEATURES INTEGRATED
 
@@ -2027,7 +2027,6 @@ local function CreateUI()
         Range = {0.01, 1.0},
         Increment = 0.01,
         CurrentValue = Config.CycleSpeed,
-        Suffix = "s",
         Callback = function(Value)
             Config.CycleSpeed = Value
         end
